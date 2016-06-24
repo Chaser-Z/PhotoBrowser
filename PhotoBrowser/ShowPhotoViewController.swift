@@ -8,12 +8,53 @@
 
 import UIKit
 
-class ShowPhotoViewController: UIViewController {
+class ShowPhotoViewController: UIViewController,UIImagePickerControllerDelegate,UINavigationControllerDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
+        self.view.backgroundColor = UIColor.whiteColor()
+        let button = UIButton(type: .Custom)
+        button.frame = CGRectMake(0, 60, self.view.width(), 30)
+        button.addTarget(self, action: #selector(ShowPhotoViewController.btnClick), forControlEvents: .TouchUpInside)
+        button.setTitle("上一页", forState: UIControlState.Normal)
+        button.backgroundColor = UIColor.blueColor()
+        self.view.addSubview(button)
+        
+        
+        let photoButton = UIButton(type: .Custom)
+        photoButton.frame = CGRectMake(0, 200, self.view.width(), 40)
+        photoButton.addTarget(self, action: #selector(ShowPhotoViewController.photoClick), forControlEvents: .TouchUpInside)
+        photoButton.setTitle("调用相册", forState: UIControlState.Normal)
+        photoButton.backgroundColor = UIColor.blueColor()
+        self.view.addSubview(photoButton)
+
+
+        
+    }
+    func btnClick()
+    {
+        self.dismissViewControllerAnimated(true) { 
+            
+        }
+    }
+    func photoClick()
+    {
+        if self.isPhotoLibraryAvailable()
+        {
+            let pickController = UIImagePickerController()
+            pickController.sourceType = .PhotoLibrary
+            pickController.delegate = self
+            self.presentViewController(pickController, animated: true, completion: { 
+                
+            })
+        }
+        
+    }
+    
+    private func isPhotoLibraryAvailable() -> Bool
+    {
+        return UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.PhotoLibrary)
     }
 
     override func didReceiveMemoryWarning() {

@@ -63,7 +63,7 @@ class GestureImageView: UIImageView {
     func handleTapGesture(sender: UITapGestureRecognizer)
     {
         
-        //print(self.superview)
+        print(self.superview)
         
         let scrollView = self.superview as! UIScrollView;
         if self.isZoomBig {
@@ -119,7 +119,7 @@ class PhotoBrowser: UIView, UIScrollViewDelegate, GestureImageViewDelegate {
     // 当前是否展现图片浏览器
     private var isShowPhotoBrowser: Bool = false
     // 图片浏览器展示的view
-    private var showView: UIView!
+    private var showView: AnyObject!
     
     //MARK: - 展示图片浏览器
     class func show(imagesArray: [AnyObject],index: Int, item: UIView, column: Int,type: ImageType,showView: UIView) ->PhotoBrowser {
@@ -173,6 +173,7 @@ class PhotoBrowser: UIView, UIScrollViewDelegate, GestureImageViewDelegate {
             // swift提供一个enumerate函数来遍历数组，会同时返回数据项和索引值
             for (i ,image) in self.imagesArray.enumerate()
             {
+            
                 
                 // 创建滚动视图
                 let imageScrollView = UIScrollView(frame: CGRectMake(CGFloat(i) * self.width(),0,self.width(),self.height()))
@@ -213,6 +214,8 @@ class PhotoBrowser: UIView, UIScrollViewDelegate, GestureImageViewDelegate {
                     {
                         let imageName: String = image  as! String;
                         imageObject = UIImage(named: imageName)
+                        print(imageObject.size)
+
                     }
                     // 设置imageView的frame
                     if imageObject.size.width < imageScrollView.width()
@@ -314,7 +317,7 @@ class PhotoBrowser: UIView, UIScrollViewDelegate, GestureImageViewDelegate {
                 
                 // 获取图片大小
                 let imageSize = imageView.image?.size
-                
+                print(imageSize)
                 
                 var imageFrame = CGRectMake(0, 0, imageSize!.width, imageSize!.height)
                 
@@ -393,7 +396,20 @@ class PhotoBrowser: UIView, UIScrollViewDelegate, GestureImageViewDelegate {
         
         
         // 展示的view
-        let view = self.showView.subviews[self.currentIndex + 2]
+        var view: UIView!
+        if self.showView is UICollectionView {
+            
+            let collectView = self.showView as! UICollectionView
+            let path = NSIndexPath(forItem: self.currentIndex, inSection: 0)
+            view = collectView.cellForItemAtIndexPath(path)
+
+
+        }
+        else if self.showView is UIView{
+            
+            view = self.showView.subviews[self.currentIndex + 2]
+
+        }
         // 取得位置
         let targetTemp: CGRect = self.showView.convertRect(view.frame, toView: self)
         //let rc = self.getExitRect()
@@ -462,6 +478,10 @@ class PhotoBrowser: UIView, UIScrollViewDelegate, GestureImageViewDelegate {
             // self.showLabel.text = "\(self.images.count) / \(self.currentIndex + 1)";
 
             let subView = self.mainScrollView.viewWithTag(self.currentIndex)!
+            
+            print(self.currentIndex)
+            print(subView)
+            
             // 当前图片
             self.currentImageView = subView.viewWithTag(imageViewTag  + self.currentIndex) as! GestureImageView
             // 当前滚动视图
