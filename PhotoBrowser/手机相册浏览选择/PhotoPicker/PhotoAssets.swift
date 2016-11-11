@@ -11,12 +11,12 @@ import Photos
 import AssetsLibrary
 
 
-typealias groupCallBackClosure = (obj:AnyObject) -> ()
+typealias groupCallBackClosure = (_ obj:AnyObject) -> ()
 
 
 class PhotoAssets: NSObject {
 
-    let IOS9_OR_LATER = UIDevice.currentDevice().systemVersion.compare("9.0") != .OrderedAscending
+    let IOS9_OR_LATER = UIDevice.current.systemVersion.compare("9.0") != .orderedAscending
     
     var asset: PHAsset!
     /** 缩略图 */
@@ -30,8 +30,8 @@ class PhotoAssets: NSObject {
     var isVideoType: Bool?
     /** 获取相册的URL */
     var assetURL: NSURL?
-    let scale = UIScreen.mainScreen().scale
-    var fetchResult :PHFetchResult!
+    let scale = UIScreen.main.scale
+    var fetchResult :PHFetchResult<PHAsset>!
 
     
     
@@ -57,28 +57,28 @@ class PhotoAssets: NSObject {
         
         let initialRequestOptions = PHImageRequestOptions()
         // 是否同步请求，设置为false，否则会很卡
-        initialRequestOptions.synchronous = false
+        initialRequestOptions.isSynchronous = false
         // Fast - 快速
-        initialRequestOptions.resizeMode = .Fast
+        initialRequestOptions.resizeMode = .fast
         // HighQualityFormat - 图片高质量
-        initialRequestOptions.deliveryMode = .FastFormat
+        initialRequestOptions.deliveryMode = .fastFormat
         // 是否允许网络请求
-        initialRequestOptions.networkAccessAllowed = false
+        initialRequestOptions.isNetworkAccessAllowed = false
 
 
         if assetCollection != nil
         {
-            self.fetchResult = PHAsset.fetchAssetsInAssetCollection(assetCollection!, options: nil)
+            self.fetchResult = PHAsset.fetchAssets(in: assetCollection!, options: nil)
 
         }
         else
         {
-            self.fetchResult = PHAsset.fetchAssetsWithOptions(nil)
+            self.fetchResult = PHAsset.fetchAssets(with: nil)
 
         }
         
         
-        finished(obj: self.fetchResult)
+        finished(self.fetchResult)
         
         
     }

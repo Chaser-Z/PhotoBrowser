@@ -32,7 +32,7 @@ class PhotoPickerBrowserPhotoTouchView: UIView {
     override init(frame: CGRect) {
         
         super.init(frame: frame)
-        self.userInteractionEnabled = true
+        self.isUserInteractionEnabled = true
         // 添加手势
         self.addGesTure()
     }
@@ -47,18 +47,18 @@ class PhotoPickerBrowserPhotoTouchView: UIView {
         self.tapGesture.numberOfTapsRequired = 2;
         self.addGestureRecognizer(tapGesture);
         // 关键在这一行，如果双击确定偵測失败才會触发单击
-        self.exitTapGesture.requireGestureRecognizerToFail(tapGesture);
+        self.exitTapGesture.require(toFail: tapGesture);
         
     }
     //MARK: - 退出手势
-    func handleExitGesture(sender: UITouch)
+    func handleExitGesture(_ sender: UITouch)
     {
-        touchDelegate.singleTapView(self, touch: sender)
+        touchDelegate.singleTapView(view: self, touch: sender)
     }
     //MARK: - 双击手势
-    func handleTapGesture(sender: UITouch)
+    func handleTapGesture(_ sender: UITouch)
     {
-        touchDelegate.doubleTapView(self, touch: sender)
+        touchDelegate.doubleTapView(view: self, touch: sender)
     }
     
     

@@ -9,8 +9,8 @@
 import UIKit
 import Photos
 
-let SCREENH = UIScreen.mainScreen().bounds.height
-let SCREENW = UIScreen.mainScreen().bounds.width
+let SCREENH = UIScreen.main.bounds.height
+let SCREENW = UIScreen.main.bounds.width
 // 图片与图片之间的间隙
 let PhotoCollectionViewPadding: CGFloat = 20
 // 缓存页数（暂时还没有做）
@@ -56,29 +56,29 @@ class PhotoBrowserViewController: UIViewController,UICollectionViewDelegate,UICo
  
 
         let layout = UICollectionViewFlowLayout()
-        layout.itemSize = CGSizeMake(SCREENW, SCREENH)
-        layout.scrollDirection = .Horizontal
+        layout.itemSize = CGSize(width: SCREENW, height: SCREENH)
+        layout.scrollDirection = .horizontal
         layout.minimumLineSpacing = PhotoCollectionViewPadding
         layout.minimumInteritemSpacing = 0
-        layout.footerReferenceSize = CGSizeMake(PhotoCollectionViewPadding, SCREENH)
+        layout.footerReferenceSize = CGSize(width: PhotoCollectionViewPadding,height: SCREENH)
 
 
         
-        let frame = UIScreen.mainScreen().bounds
-        let tCollectionView: UICollectionView = UICollectionView(frame: CGRectMake(0, 0, frame.size.width + PhotoCollectionViewPadding, frame.size.height), collectionViewLayout: layout)
+        let frame = UIScreen.main.bounds
+        let tCollectionView: UICollectionView = UICollectionView(frame: CGRect(x: 0,y: 0,width: frame.size.width + PhotoCollectionViewPadding,height: frame.size.height), collectionViewLayout: layout)
         tCollectionView.showsVerticalScrollIndicator = false
         tCollectionView.showsHorizontalScrollIndicator = true
-        tCollectionView.pagingEnabled = true
-        tCollectionView.backgroundColor = UIColor.blackColor()
+        tCollectionView.isPagingEnabled = true
+        tCollectionView.backgroundColor = UIColor.black
         tCollectionView.bounces = true
         tCollectionView.delegate = self
         tCollectionView.dataSource = self
-        tCollectionView.registerClass(PhotoBrowserCell.self, forCellWithReuseIdentifier: "PhotoBrowserCell")
+        tCollectionView.register(PhotoBrowserCell.self, forCellWithReuseIdentifier: "PhotoBrowserCell")
 
         if self.isSample == false {
             
             
-            let point = CGPointMake(CGFloat(self.currentIndexPath.row) * tCollectionView.frame.size.width, 0)
+            let point = CGPoint(x: CGFloat(self.currentIndexPath.row) * tCollectionView.frame.size.width,y: 0)
             tCollectionView.contentOffset = point
             //tCollectionView.scrollToItemAtIndexPath(self.currentIndexPath, atScrollPosition: .None, animated: false)
 
@@ -96,15 +96,16 @@ class PhotoBrowserViewController: UIViewController,UICollectionViewDelegate,UICo
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.view.backgroundColor = UIColor.whiteColor()
+        self.view.backgroundColor = UIColor.white
         
-        dispatch_async(dispatch_get_main_queue()) { 
+
+        DispatchQueue.main.async { [weak self] ()->() in
             
-            self.view.addSubview(self.collectionView)
+            self?.view.addSubview((self?.collectionView)!)
             
             
-            self.setupToolbar()
-            self.setupTopView()
+            self?.setupToolbar()
+            self?.setupTopView()
 
         }
         
@@ -116,8 +117,8 @@ class PhotoBrowserViewController: UIViewController,UICollectionViewDelegate,UICo
     // MARK: - 浏览图片上部分View
     private func setupTopView(){
     
-        self.topView = PhotoPickerBrowserTopView(frame: CGRectMake(0, 0, self.view.width(), 64))
-        self.topView.addTarget(self, backAction: #selector(PhotoBrowserViewController.back), selectAction: #selector(PhotoBrowserViewController.selectBtnClick(_:)), controlEvents: .TouchUpInside)
+        self.topView = PhotoPickerBrowserTopView(frame: CGRect(x: 0,y: 0,width: self.view.width(),height: 64))
+        self.topView.addTarget(target: self, backAction: #selector(PhotoBrowserViewController.back), selectAction: #selector(PhotoBrowserViewController.selectBtnClick(_:)), controlEvents: .touchUpInside)
         self.view.addSubview(self.topView)
 
         self.updateSelectBtn()
@@ -126,20 +127,24 @@ class PhotoBrowserViewController: UIViewController,UICollectionViewDelegate,UICo
     // MARK: - 返回按钮点击事件
     func back()
     {
-        self.dismissViewControllerAnimated(true, completion: nil)
+        self.dismiss(animated: true, completion: nil)
     }
     // MARK: - 选择按钮点击事件
-    func selectBtnClick(btn:UIButton)
+    func selectBtnClick(_ btn:UIButton)
     {
         
-        let cell = self.collectionView.cellForItemAtIndexPath(NSIndexPath(forRow: self.currentIndex, inSection: 0)) as! PhotoBrowserCell
+        //let cell = self.collectionView.cellForItemAtIndexPath(NSIndexPath(forRow: self.currentIndex, inSection: 0)) as! PhotoBrowserCell
+        
+        let cell = self.collectionView.cellForItem(at: IndexPath(row: self.currentIndex, section: 0)) as! PhotoBrowserCell
+        
+        
  
         
-        btn.selected = !btn.selected
+        btn.isSelected = !btn.isSelected
         
         var removeIndex: Int!
         
-        if btn.selected == false {
+        if btn.isSelected == false {
             
             //btn.addAnimation(0.3)
             
@@ -153,7 +158,7 @@ class PhotoBrowserViewController: UIViewController,UICollectionViewDelegate,UICo
                     
                     if i == self.currentIndex {
                         
-                        self.selectPhotosArray!.removeObject(model)
+                        self.selectPhotosArray!.remove(model)
                         removeIndex = model.index
                         break
                     }
@@ -163,7 +168,7 @@ class PhotoBrowserViewController: UIViewController,UICollectionViewDelegate,UICo
                    
                     if model.index == self.currentIndex {
                         
-                        self.selectPhotosArray!.removeObject(model)
+                        self.selectPhotosArray!.remove(model)
                         break
                     }
 
@@ -174,12 +179,12 @@ class PhotoBrowserViewController: UIViewController,UICollectionViewDelegate,UICo
             //self.selectPhotosArray?.removeObject(cell.scrollView.photoImageView.image!)
             if self.isSample == true {
                 
-                self.selectPhotoNumbesArray!.replaceObjectAtIndex(removeIndex, withObject: "1")
+                self.selectPhotoNumbesArray!.replaceObject(at: removeIndex, with: "1")
 
                 
             } else {
                 
-                self.selectPhotoNumbesArray!.replaceObjectAtIndex(self.currentIndex, withObject: "1")
+                self.selectPhotoNumbesArray!.replaceObject(at: self.currentIndex, with: "1")
 
             }
 
@@ -191,9 +196,9 @@ class PhotoBrowserViewController: UIViewController,UICollectionViewDelegate,UICo
             model.index = cell.scrollView.photoImageView.tag
 
             
-            btn.addAnimation(0.3)
-            self.selectPhotosArray?.addObject(model)
-            self.selectPhotoNumbesArray!.replaceObjectAtIndex(cell.scrollView.photoImageView.tag, withObject: "2")
+            btn.addAnimation(durationTime: 0.3)
+            self.selectPhotosArray?.add(model)
+            self.selectPhotoNumbesArray!.replaceObject(at: cell.scrollView.photoImageView.tag, with: "2")
 
             
         }
@@ -201,28 +206,28 @@ class PhotoBrowserViewController: UIViewController,UICollectionViewDelegate,UICo
         
         let objectArray = NSMutableArray()
         
-        objectArray.addObject(self.selectPhotoNumbesArray!)
-        objectArray.addObject(self.selectPhotosArray!)
+        objectArray.add(self.selectPhotoNumbesArray!)
+        objectArray.add(self.selectPhotosArray!)
         
         // 发送通知
-        NSNotificationCenter.defaultCenter().postNotificationName("changeSelectButton", object: objectArray)
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "changeSelectButton"), object: objectArray)
        // print(self.selectPhotoNumbesArray)
         
         
-        self.toolBar.rightSendBtn.setTitle(String(format: "发送(%d张)",(self.selectPhotosArray?.count)!), forState: .Normal)
-        if self.selectPhotosArray?.count > 0 {
+        self.toolBar.rightSendBtn.setTitle(String(format: "发送(%d张)",(self.selectPhotosArray?.count)!), for: .normal)
+        if (self.selectPhotosArray?.count)! > 0 {
             
-            self.toolBar.rightSendBtn.selected = true
-            self.toolBar.leftBtn.selected = true
-            self.toolBar.rightSendBtn.enabled = true
-            self.toolBar.leftBtn.enabled = true
+            self.toolBar.rightSendBtn.isSelected = true
+            self.toolBar.leftBtn.isSelected = true
+            self.toolBar.rightSendBtn.isEnabled = true
+            self.toolBar.leftBtn.isEnabled = true
 
         } else {
             
-            self.toolBar.rightSendBtn.selected = false
-            self.toolBar.leftBtn.selected = false
-            self.toolBar.rightSendBtn.enabled = false
-            self.toolBar.leftBtn.enabled = false
+            self.toolBar.rightSendBtn.isSelected = false
+            self.toolBar.leftBtn.isSelected = false
+            self.toolBar.rightSendBtn.isEnabled = false
+            self.toolBar.leftBtn.isEnabled = false
         }
 
     }
@@ -237,7 +242,8 @@ class PhotoBrowserViewController: UIViewController,UICollectionViewDelegate,UICo
             // 页面加载完毕
             if self.isShowBrower == true {
                 
-                let cell = self.collectionView.cellForItemAtIndexPath(NSIndexPath(forRow: self.currentIndex, inSection: 0)) as! PhotoBrowserCell
+                //let cell = self.collectionView.cellForItemAtIndexPath(NSIndexPath(forRow: self.currentIndex, inSection: 0)) as! PhotoBrowserCell
+                let cell = self.collectionView.cellForItem(at: IndexPath(row: self.currentIndex, section: 0)) as! PhotoBrowserCell
 
                 index = cell.scrollView.photoImageView.tag
                 
@@ -245,18 +251,18 @@ class PhotoBrowserViewController: UIViewController,UICollectionViewDelegate,UICo
 
             if self.selectPhotoNumbesArray![index] as! String == "2" {
                 
-                self.topView.selectBtn.selected = true
+                self.topView.selectBtn.isSelected = true
                 
             } else {
                 
-                self.topView.selectBtn.selected = false
+                self.topView.selectBtn.isSelected = false
                 
             }
             
             // 页面没加载完成
             if self.isShowBrower != true {
                 
-                self.topView.selectBtn.selected = true
+                self.topView.selectBtn.isSelected = true
 
             }
 
@@ -267,11 +273,11 @@ class PhotoBrowserViewController: UIViewController,UICollectionViewDelegate,UICo
         
             if self.selectPhotoNumbesArray![self.currentIndex] as! String == "2" {
                 
-                self.topView.selectBtn.selected = true
+                self.topView.selectBtn.isSelected = true
                 
             } else {
                 
-                self.topView.selectBtn.selected = false
+                self.topView.selectBtn.isSelected = false
                 
             }
 
@@ -281,8 +287,8 @@ class PhotoBrowserViewController: UIViewController,UICollectionViewDelegate,UICo
     // MARK: - 浏览图片下部分View
     private func setupToolbar(){
         
-        self.toolBar.frame = CGRectMake(0, self.view.height() - 44, self.view.width(), 44)
-        self.toolBar.leftBtn.hidden = true
+        self.toolBar.frame = CGRect(x: 0,y: self.view.height() - 44,width: self.view.width(),height: 44)
+        self.toolBar.leftBtn.isHidden = true
         self.toolBar.toolBarViewDelegate = self
         self.view.addSubview(toolBar)
     }
@@ -290,15 +296,15 @@ class PhotoBrowserViewController: UIViewController,UICollectionViewDelegate,UICo
     func pickerPhotoScrollViewDidSingleClick(browserPhotoScrollView: PhotoPickerBrowserPhotoImageView) {
         
         // 隐藏
-        if topView.hidden == true {
+        if topView.isHidden == true {
            
-            topView.hidden = false
-            toolBar.hidden = false
+            topView.isHidden = false
+            toolBar.isHidden = false
             
         } else {
             
-            topView.hidden = true
-            toolBar.hidden = true
+            topView.isHidden = true
+            toolBar.isHidden = true
         }
 
     }
@@ -318,11 +324,11 @@ class PhotoBrowserViewController: UIViewController,UICollectionViewDelegate,UICo
         
     }
     //MARK: - UICollectionViewDataSource
-    func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
+    private func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
         
         return 1
     }
-    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
         // 预览数组元素个数
         if self.isSample == true {
@@ -332,9 +338,9 @@ class PhotoBrowserViewController: UIViewController,UICollectionViewDelegate,UICo
         // 看全部图片元素个数
         return photosArray.count
     }
-    func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("PhotoBrowserCell", forIndexPath: indexPath) as! PhotoBrowserCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoBrowserCell", for: indexPath as IndexPath) as! PhotoBrowserCell
         cell.resetUI()
         cell.tag = 200 + indexPath.row
         
@@ -347,27 +353,27 @@ class PhotoBrowserViewController: UIViewController,UICollectionViewDelegate,UICo
             cell.scrollView.photoImageView.tag = model.index
             cell.scrollView.browerPhotoScrollViewDelegate = self
             
-            self.layoutImageViewSize(cell, image: cell.scrollView.photoImageView.image!)
+            self.layoutImageViewSize(cell: cell, image: cell.scrollView.photoImageView.image!)
 
             
         } else {
            
             
 
-            let mainQueue = dispatch_get_main_queue()
-            dispatch_async(mainQueue, {
+            let mainQueue = DispatchQueue.main
+            mainQueue.async{
             
                 
-                self.loadImage(cell, index: indexPath.item)
+                self.loadImage(cell: cell, index: indexPath.item)
                 
-            })
+            }
               print("~~~~~~~~~")
                 
  
         }
         
         self.browerScrollView = cell.scrollView
-        self.currentIndexPath = indexPath
+        self.currentIndexPath = indexPath as NSIndexPath!
         self.currentIndex = self.currentIndexPath.row
         self.photoImageView = cell.scrollView.photoImageView
 
@@ -381,13 +387,13 @@ class PhotoBrowserViewController: UIViewController,UICollectionViewDelegate,UICo
         
         let initialRequestOptions = PHImageRequestOptions()
         // 是否同步请求，设置为false，否则会很卡
-        initialRequestOptions.synchronous = false
+        initialRequestOptions.isSynchronous = false
         // Fast - 快速
-        initialRequestOptions.resizeMode = .Fast
+        initialRequestOptions.resizeMode = .fast
         // HighQualityFormat - 图片高质量
-        initialRequestOptions.deliveryMode = .HighQualityFormat
+        initialRequestOptions.deliveryMode = .highQualityFormat
         // 是否允许网络请求
-        initialRequestOptions.networkAccessAllowed = false
+        initialRequestOptions.isNetworkAccessAllowed = false
         
         var asset: PHAsset!
 
@@ -396,18 +402,18 @@ class PhotoBrowserViewController: UIViewController,UICollectionViewDelegate,UICo
         
         // PHImageManagerMaximumSize 获取原图 但是莫名会卡，有时候崩溃
         // 可以这样获取原图
-        let targetSize = CGSizeMake(CGFloat(asset.pixelWidth), CGFloat(asset.pixelHeight))
+        let targetSize = CGSize(width: CGFloat(asset.pixelWidth),height: CGFloat(asset.pixelHeight))
         // CGSizeMake(self.view.width(),self.view.height())
         if self.cacheArray![index] is String {
             
-            self.imageManager.requestImageForAsset(asset, targetSize:targetSize , contentMode: .AspectFill, options: initialRequestOptions) { (result, info) in
+            self.imageManager.requestImage(for: asset, targetSize:targetSize , contentMode: .aspectFill, options: initialRequestOptions) { (result, info) in
                 
                 //print("result = \(result)")
                 
                 cell.scrollView.photoImageView.image = result
                 cell.scrollView.photoImageView.tag = index
                 cell.scrollView.browerPhotoScrollViewDelegate = self
-                self.layoutImageViewSize(cell, image: result!)
+                self.layoutImageViewSize(cell: cell, image: result!)
                 
             }
 
@@ -416,7 +422,7 @@ class PhotoBrowserViewController: UIViewController,UICollectionViewDelegate,UICo
             cell.scrollView.photoImageView.image = self.cacheArray![index] as? UIImage
             cell.scrollView.photoImageView.tag = index
             cell.scrollView.browerPhotoScrollViewDelegate = self
-            self.layoutImageViewSize(cell, image: (self.cacheArray![index] as? UIImage)!)
+            self.layoutImageViewSize(cell: cell, image: (self.cacheArray![index] as? UIImage)!)
             
         }
         
@@ -431,7 +437,7 @@ class PhotoBrowserViewController: UIViewController,UICollectionViewDelegate,UICo
             if pid < self.photosArray.count {
                 
                 asset = self.photosArray[pid]
-                self.cacheImage(pid, asset: asset)
+                self.cacheImage(pid: pid, asset: asset)
                 //print("load page \(pid)")
                 
             }
@@ -439,7 +445,7 @@ class PhotoBrowserViewController: UIViewController,UICollectionViewDelegate,UICo
             if pid >= 0 {
                 
                 asset = self.photosArray[pid]
-                self.cacheImage(pid, asset: asset)
+                self.cacheImage(pid: pid, asset: asset)
 
                 //print("load page \(pid)")
 
@@ -458,24 +464,24 @@ class PhotoBrowserViewController: UIViewController,UICollectionViewDelegate,UICo
                 
                 let initialRequestOptions = PHImageRequestOptions()
                 // 是否同步请求，设置为false，否则会很卡
-                initialRequestOptions.synchronous = false
+                initialRequestOptions.isSynchronous = false
                 // Fast - 快速
-                initialRequestOptions.resizeMode = .Fast
+                initialRequestOptions.resizeMode = .fast
                 // HighQualityFormat - 图片高质量
-                initialRequestOptions.deliveryMode = .HighQualityFormat
+                initialRequestOptions.deliveryMode = .highQualityFormat
                 // 是否允许网络请求
-                initialRequestOptions.networkAccessAllowed = false
+                initialRequestOptions.isNetworkAccessAllowed = false
                 
                 
                 // PHImageManagerMaximumSize 获取原图 但是莫名会卡，有时候崩溃
                 // 可以这样获取原图
-                let targetSize = CGSizeMake(CGFloat(asset.pixelWidth), CGFloat(asset.pixelHeight))
+                let targetSize = CGSize(width: CGFloat(asset.pixelWidth),height: CGFloat(asset.pixelHeight))
                 // CGSizeMake(self.view.width(),self.view.height())
-                self.imageManager.requestImageForAsset(asset, targetSize:targetSize , contentMode: .AspectFill, options: initialRequestOptions) { (result, info) in
+                self.imageManager.requestImage(for: asset, targetSize:targetSize , contentMode: .aspectFill, options: initialRequestOptions) { (result, info) in
                     
                     //print("result = \(result)")
                     
-                    self.cacheArray?.replaceObjectAtIndex(pid, withObject: result!)
+                    self.cacheArray?.replaceObject(at: pid, with: result!)
                 }
 
             }
@@ -493,15 +499,15 @@ class PhotoBrowserViewController: UIViewController,UICollectionViewDelegate,UICo
         
         // 获取图片大小
         let imageSize = image.size
-        var imageFrame = CGRectMake(0, 0, imageSize.width, imageSize.height)
+        var imageFrame = CGRect(x: 0,y: 0,width: imageSize.width,height: imageSize.height)
         let ratio = self.view.frame.size.width / imageFrame.size.width
         imageFrame.size.height = imageFrame.size.height * ratio
         imageFrame.size.width = self.view.frame.size.width
-        cell.scrollView.contentSize = CGSizeMake(0, imageFrame.height)
+        cell.scrollView.contentSize = CGSize(width: 0,height: imageFrame.height)
         cell.scrollView.photoImageView.frame = imageFrame
         if imageFrame.height < SCREENH {
             
-            cell.scrollView.photoImageView.center = CGPointMake(self.view.frame.size.width / 2, self.view.frame.size.height / 2)
+            cell.scrollView.photoImageView.center = CGPoint(x: self.view.frame.size.width / 2,y: self.view.frame.size.height / 2)
  
         }
 
@@ -520,12 +526,12 @@ class PhotoBrowserViewController: UIViewController,UICollectionViewDelegate,UICo
         
         
     }
-    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        self.dismissViewControllerAnimated(true, completion: nil)
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        self.dismiss(animated: true, completion: nil)
         
     }
     //MARK: - UIScrollViewDelegate
-    func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         
         self.currentIndex = Int(floor((scrollView.contentOffset.x - scrollView.width() / 2.0) / scrollView.width())) + 1
         
@@ -538,35 +544,35 @@ class PhotoBrowserViewController: UIViewController,UICollectionViewDelegate,UICo
             
         }
     }
-    func scrollViewDidScroll(scrollView: UIScrollView) {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
         
     }
-    func scrollViewWillEndDragging(scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+    func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         
         super.viewDidAppear(animated)
         self.isShowBrower = true
         
 
     }
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         // 遍历selectPhotosArray数组，把每个元素分别添加到samplePhotoArray数组中
         for i in 0 ..< self.selectPhotosArray!.count {
             
             let model: PhotoSampleModel = self.selectPhotosArray![i] as! PhotoSampleModel
-            self.samplePhotoArray.addObject(model)
+            self.samplePhotoArray.add(model)
         }
         
         self.cacheArray = NSMutableArray()
         for _ in 0 ..< self.photosArray.count {
             
             let str = ""
-            self.cacheArray?.addObject(str)
+            self.cacheArray?.add(str)
             
         }
         

@@ -9,12 +9,12 @@
 import UIKit
 import Photos
 
-let SCREEN_W = UIScreen.mainScreen().bounds.size.width
+let SCREEN_W = UIScreen.main.bounds.size.width
 let CELL_W = (SCREEN_W-10)/4
 
 class PhotoPickerAssetsViewController: UIViewController,PickerCollectionViewDelegate,PhotoPickerBrowserToolBarViewDelegate {
 
-    var fetchResult :PHFetchResult!
+    var fetchResult :PHFetchResult<AnyObject>!
     var assetCollection :PHAssetCollection!
     var imageArray = Array<UIImage>()
     var toolBar: PhotoPickerBrowserToolBarView!
@@ -23,24 +23,24 @@ class PhotoPickerAssetsViewController: UIViewController,PickerCollectionViewDele
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.view.backgroundColor = UIColor.whiteColor()
+        self.view.backgroundColor = UIColor.white
         
-        dispatch_async(dispatch_get_main_queue()) { 
+        DispatchQueue.main.async { [weak self] ()->() in
             
             
-            PhotoAssets.myPhotoAssets.sharedPhotoAssets.getGroupPhotosWithGroup(self.assetCollection) { (obj) in
+            PhotoAssets.myPhotoAssets.sharedPhotoAssets.getGroupPhotosWithGroup(assetCollection: self?.assetCollection) { (obj) in
                 
                 var zAssets:Array<PHAsset> = []
                 
-                obj.enumerateObjectsUsingBlock({ (asset, index, stop) in
+                obj.enumerateObjects({ (asset, index, stop) in
                     
                     
                     //print("asset = \(asset) index = \(index) stop = \(stop)")
-                    zAssets.append(asset as! PHAsset)
+                    zAssets.append(asset )
                 })
                 
                 
-                self.collectionView.imageArray = zAssets
+                self?.collectionView.imageArray = zAssets
                 
                 print("self.imageArray = \(zAssets)")
                 print("count = \(zAssets.count)")
@@ -48,7 +48,7 @@ class PhotoPickerAssetsViewController: UIViewController,PickerCollectionViewDele
                 
             }
 
-            self.setupToolbar()
+            self?.setupToolbar()
 
             
         }
@@ -60,7 +60,7 @@ class PhotoPickerAssetsViewController: UIViewController,PickerCollectionViewDele
     private func setupToolbar(){
         
         
-        toolBar = PhotoPickerBrowserToolBarView(frame: CGRectMake(0, self.view.height() - 44, self.view.width(), 44))
+        toolBar = PhotoPickerBrowserToolBarView(frame: CGRect(x: 0,y: self.view.height() - 44,width: self.view.width(),height: 44))
         toolBar.toolBarViewDelegate = self
         self.view.addSubview(toolBar)
     }
@@ -68,24 +68,24 @@ class PhotoPickerAssetsViewController: UIViewController,PickerCollectionViewDele
     lazy var collectionView: PickerCollectionView = {
         let layout = UICollectionViewFlowLayout()
         // cell的大小
-        layout.itemSize = CGSizeMake(CELL_W, CELL_W)
+        layout.itemSize = CGSize(width: CELL_W,height: CELL_W)
         // 每行的间距
         layout.minimumLineSpacing = 2
         // 每行cell内部的间距
         layout.minimumInteritemSpacing = 2
         layout.sectionInset = UIEdgeInsetsMake(2, 2, 2, 2);
         
-        let theCollectionView: PickerCollectionView = PickerCollectionView.init(frame: CGRectMake(0, 0, SCREEN_W, self.view.bounds.size.height  - 44), collectionViewLayout: layout)
+        let theCollectionView: PickerCollectionView = PickerCollectionView.init(frame: CGRect(x: 0,y: 0,width: SCREEN_W,height: self.view.bounds.size.height  - 44), collectionViewLayout: layout)
         theCollectionView.photosTransitiveClosures = { (photoArray: NSMutableArray) -> Void in
             
-            self.changeToolBarButtonStatus(photoArray)
+            self.changeToolBarButtonStatus(photoArray: photoArray)
             
 
         }
-        theCollectionView.backgroundColor = UIColor.whiteColor()
+        theCollectionView.backgroundColor = UIColor.white
         theCollectionView.showsVerticalScrollIndicator = false
         theCollectionView.showsHorizontalScrollIndicator = false
-        theCollectionView.registerClass(PickerCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+        theCollectionView.register(PickerCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
         theCollectionView.pickerDelegate = self
         self.view.addSubview(theCollectionView)
         return theCollectionView
@@ -99,22 +99,22 @@ class PhotoPickerAssetsViewController: UIViewController,PickerCollectionViewDele
         
         if photoArray.count > 0 {
             
-            self.toolBar.rightSendBtn.selected = true
-            self.toolBar.leftBtn.selected = true
-            self.toolBar.rightSendBtn.enabled = true
-            self.toolBar.leftBtn.enabled = true
+            self.toolBar.rightSendBtn.isSelected = true
+            self.toolBar.leftBtn.isSelected = true
+            self.toolBar.rightSendBtn.isEnabled = true
+            self.toolBar.leftBtn.isEnabled = true
 
         } else {
             
-            self.toolBar.rightSendBtn.selected = false
-            self.toolBar.leftBtn.selected = false
-            self.toolBar.rightSendBtn.enabled = false
-            self.toolBar.leftBtn.enabled = false
+            self.toolBar.rightSendBtn.isSelected = false
+            self.toolBar.leftBtn.isSelected = false
+            self.toolBar.rightSendBtn.isEnabled = false
+            self.toolBar.leftBtn.isEnabled = false
 
         }
         
         
-        self.toolBar.rightSendBtn.setTitle(String(format: "发送(%d张)",(photoArray.count)), forState: .Normal)
+        self.toolBar.rightSendBtn.setTitle(String(format: "发送(%d张)",(photoArray.count)), for: .normal)
 
     }
     
@@ -129,7 +129,7 @@ class PhotoPickerAssetsViewController: UIViewController,PickerCollectionViewDele
         vc.selectPhotosArray  = self.collectionView.selectPhotosArray
         vc.currentIndexPath = indexPath
     
-        self.presentViewController(vc, animated: true) { 
+        self.present(vc, animated: true) { 
             
         }
     }
@@ -142,7 +142,7 @@ class PhotoPickerAssetsViewController: UIViewController,PickerCollectionViewDele
         vc.isSample = true
         vc.toolBar = self.toolBar
         vc.selectPhotosArray  = self.collectionView.selectPhotosArray
-        self.presentViewController(vc, animated: true) {
+        self.present(vc, animated: true) {
             
         }
 
@@ -153,19 +153,19 @@ class PhotoPickerAssetsViewController: UIViewController,PickerCollectionViewDele
         
     }
 
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         if self.toolBar != nil {
             
-            self.toolBar.frame = CGRectMake(0, self.view.height() - 44, self.view.width(), 44)
+            self.toolBar.frame = CGRect(x: 0,y: self.view.height() - 44,width: self.view.width(),height: 44)
             self.toolBar.toolBarViewDelegate = self
-            self.toolBar.leftBtn.hidden = false
+            self.toolBar.leftBtn.isHidden = false
             self.view.addSubview(self.toolBar)
         } else {
             
         }
     }
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
     }
 

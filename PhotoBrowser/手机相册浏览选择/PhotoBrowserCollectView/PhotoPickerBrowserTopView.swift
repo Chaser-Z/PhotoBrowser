@@ -20,19 +20,19 @@ class PhotoPickerBrowserTopView: UIView {
     }
     private func setupUI(){
         
-        self.backgroundColor = UIColor.blackColor()
+        self.backgroundColor = UIColor.black
         self.alpha = 0.7
         
-        self.backBtn = UIButton(type: .Custom)
-        self.backBtn.frame = CGRectMake(0, 20, 60, 50)
-        self.backBtn.setImage(UIImage(named: "btn_back_imagePicker.png"), forState: .Normal)
-        self .addSubview(self.backBtn)
+        self.backBtn = UIButton(type: .custom)
+        self.backBtn.frame = CGRect(x:0,y: 20,width: 60,height: 50)
+        self.backBtn.setImage(UIImage(named: "btn_back_imagePicker.png"), for: .normal)
+        self.addSubview(self.backBtn)
         
         
-        self.selectBtn = UIButton(type: .Custom)
-        self.selectBtn.frame = CGRectMake(self.frame.size.width - 20 - 30, 20 + 7, 30, 30)
-        self.selectBtn.setImage(UIImage(named: "CellGreySelected"), forState: .Normal)
-        self.selectBtn.setImage(UIImage(named: "CellBlueSelected"), forState: .Selected)
+        self.selectBtn = UIButton(type: .custom)
+        self.selectBtn.frame = CGRect(x: self.frame.size.width - 20 - 30,y: 20 + 7,width: 30, height: 30)
+        self.selectBtn.setImage(UIImage(named: "CellGreySelected"), for: .normal)
+        self.selectBtn.setImage(UIImage(named: "CellBlueSelected"), for: .selected)
 
         self.addSubview(self.selectBtn)
 
@@ -40,8 +40,8 @@ class PhotoPickerBrowserTopView: UIView {
     // MARK: - 点击事件
     func addTarget(target:AnyObject,backAction:Selector,selectAction:Selector,controlEvents:UIControlEvents)
     {
-        self.backBtn.addTarget(target, action: backAction, forControlEvents: controlEvents)
-        self.selectBtn.addTarget(target, action: selectAction, forControlEvents: controlEvents)
+        self.backBtn.addTarget(target, action: backAction, for: controlEvents)
+        self.selectBtn.addTarget(target, action: selectAction, for: controlEvents)
     }
     
     required init?(coder aDecoder: NSCoder) {

@@ -15,20 +15,35 @@ class GroupsCell: UITableViewCell {
     var photoCountLabel: UILabel!
     var model: PhotoModel!{
         
-        didSet{
+        didSet
+        {
             
             self.photogroupNameLabel.text = model.title
             self.photoCountLabel.text = String(format: "%d", model.count)
             
-            PHImageManager.defaultManager().requestImageForAsset(model.fetchResult.lastObject as! PHAsset, targetSize: CGSizeMake(120, 120), contentMode: .AspectFill, options: nil) { (image, _: [NSObject: AnyObject]?) in
-                
+            
+            
+//            PHImageManager.defaultManager().requestImageForAsset(model.fetchResult.lastObject as! PHAsset, targetSize: CGSizeMake(120, 120), contentMode: .AspectFill, options: nil) { (image, _: [NSObject: AnyObject]?) in
+//                
+//                if image == nil
+//                {
+//                    return
+//                }
+//                self.leftImageView.image = image
+//                
+// 
+//            }
+//            
+            
+            PHImageManager.default().requestImage(for: model.fetchResult.lastObject as! PHAsset, targetSize: CGSize(width: 120,height: 120), contentMode: .aspectFill, options: nil) { (image, _) in
                 if image == nil
                 {
                     return
                 }
                 self.leftImageView.image = image
                 
- 
+
+                
             }
 
         }
@@ -44,16 +59,16 @@ class GroupsCell: UITableViewCell {
     private func setUI()
     {
         leftImageView = UIImageView()
-        leftImageView.frame = CGRectMake(0, 0, 60, 60)
-        leftImageView.backgroundColor = UIColor.purpleColor()
+        leftImageView.frame = CGRect(x: 0,y: 0,width: 60,height: 60)
+        leftImageView.backgroundColor = UIColor.purple
         self.contentView.addSubview(leftImageView)
         
         self.photogroupNameLabel = UILabel()
-        self.photogroupNameLabel.frame = CGRectMake(70, 7.5, 200, 20)
+        self.photogroupNameLabel.frame = CGRect(x: 70,y: 7.5,width: 200,height: 20)
         self.contentView.addSubview(self.photogroupNameLabel)
         
         self.photoCountLabel = UILabel()
-        self.photoCountLabel.frame = CGRectMake(70, 30, 100, 20)
+        self.photoCountLabel.frame = CGRect(x: 70,y: 30,width: 100,height: 20)
         self.contentView.addSubview(self.photoCountLabel)
     }
     
@@ -116,7 +131,7 @@ class GroupsCell: UITableViewCell {
         // Initialization code
     }
 
-    override func setSelected(selected: Bool, animated: Bool) {
+    override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
 
         // Configure the view for the selected state

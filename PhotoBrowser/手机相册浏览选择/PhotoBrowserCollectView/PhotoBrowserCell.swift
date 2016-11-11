@@ -23,7 +23,7 @@ class PhotoBrowserCell: UICollectionViewCell {
     }
     private func setUI()
     {
-        let tempFrame = UIScreen.mainScreen().bounds
+        let tempFrame = UIScreen.main.bounds
         let scrollBoxView = UIView()
         scrollBoxView.frame = tempFrame
         self.contentView.addSubview(scrollBoxView)

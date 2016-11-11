@@ -18,7 +18,7 @@ struct PhotoModel {
     
     let title: String
     let count: Int
-    let fetchResult: PHFetchResult
+    let fetchResult: PHFetchResult<AnyObject>
     let assetCollection: AnyObject
 
 }

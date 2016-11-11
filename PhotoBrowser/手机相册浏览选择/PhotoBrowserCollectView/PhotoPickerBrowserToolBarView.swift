@@ -39,19 +39,19 @@ class PhotoPickerBrowserToolBarView: UIView {
 //        self.toolBar.barTintColor = UIColor.blackColor()
 //        self.toolBar.alpha = 0.7
 //        self.addSubview(self.toolBar)
-        self.backgroundColor = UIColor.blackColor()
+        self.backgroundColor = UIColor.black
         self.alpha = 0.7
         self .createButton()
     }
     private func createButton(){
         
-        self.leftBtn = self.setupButton(nil, title: "预览", titleColor: UIColor.whiteColor(),unSelectedTitleColor: UIColor.grayColor() ,target: self, action: #selector(PhotoPickerBrowserToolBarView.letfBtnClick),isLeft: true)
-        self.leftBtn.selected = false
-        self.leftBtn.enabled = false
+        self.leftBtn = self.setupButton(image: nil, title: "预览", titleColor: UIColor.white,unSelectedTitleColor: UIColor.gray ,target: self, action: #selector(PhotoPickerBrowserToolBarView.letfBtnClick),isLeft: true)
+        self.leftBtn.isSelected = false
+        self.leftBtn.isEnabled = false
         
-        self.rightSendBtn = self.setupButton(nil, title: "发送", titleColor: UIColor.greenColor(), unSelectedTitleColor: UIColor.grayColor() ,target: self, action: #selector(PhotoPickerBrowserToolBarView.sendPhotosClick), isLeft: false)
-        self.rightSendBtn.selected = false
-        self.rightSendBtn.enabled = false
+        self.rightSendBtn = self.setupButton(image: nil, title: "发送", titleColor: UIColor.green, unSelectedTitleColor: UIColor.gray ,target: self, action: #selector(PhotoPickerBrowserToolBarView.sendPhotosClick), isLeft: false)
+        self.rightSendBtn.isSelected = false
+        self.rightSendBtn.isEnabled = false
 
         self.addSubview(self.leftBtn)
         self.addSubview(self.rightSendBtn)
@@ -63,27 +63,27 @@ class PhotoPickerBrowserToolBarView: UIView {
     }
     private func setupButton(image:UIImage?,title: String,titleColor: UIColor,unSelectedTitleColor: UIColor,target: AnyObject,action: Selector,isLeft: Bool) -> UIButton {
         
-        let button = UIButton(type: .Custom)
+        let button = UIButton(type: .custom)
         if  isLeft == true {
             
-            button.frame = CGRectMake(0, 0, 100, 44)
-            button.titleLabel?.textAlignment = .Left
+            button.frame = CGRect(x:0,y: 0,width: 100,height: 44)
+            button.titleLabel?.textAlignment = .left
             
         } else {
             
-            button.frame = CGRectMake(self.width() - 100, 0, 100, 44)
-            button.titleLabel?.textAlignment = .Right
+            button.frame = CGRect(x: self.width() - 100,y: 0,width: 100,height: 44)
+            button.titleLabel?.textAlignment = .right
 
         }
-        button.setTitle(title, forState: .Normal)
-        button.setTitleColor(unSelectedTitleColor, forState: .Normal)
-        button.setTitleColor(titleColor, forState: .Selected)
+        button.setTitle(title, for: .normal)
+        button.setTitleColor(unSelectedTitleColor, for: .normal)
+        button.setTitleColor(titleColor, for: .selected)
         if image != nil {
             
-            button.setImage(image, forState: .Normal)
+            button.setImage(image, for: .normal)
 
         }
-        button.addTarget(target, action: action, forControlEvents: .TouchUpInside)
+        button.addTarget(target, action: action, for: .touchUpInside)
 
 
         //let barButton: UIBarButtonItem = UIBarButtonItem(customView: button)

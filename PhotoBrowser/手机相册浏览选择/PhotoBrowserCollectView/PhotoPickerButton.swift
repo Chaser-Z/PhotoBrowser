@@ -33,7 +33,7 @@ extension UIButton {
     
     func addAnimation(durationTime: Double) {
         let groupAnimation = CAAnimationGroup()
-        groupAnimation.removedOnCompletion = true
+        groupAnimation.isRemovedOnCompletion = true
         
         let animationZoomOut = CABasicAnimation(keyPath: "transform.scale")
         animationZoomOut.fromValue = 0
@@ -47,7 +47,7 @@ extension UIButton {
         animationZoomIn.duration = 1/4 * durationTime
         
         groupAnimation.animations = [animationZoomOut, animationZoomIn]
-        self.layer.addAnimation(groupAnimation, forKey: "addAnimation")
+        self.layer.add(groupAnimation, forKey: "addAnimation")
     }
 
 }

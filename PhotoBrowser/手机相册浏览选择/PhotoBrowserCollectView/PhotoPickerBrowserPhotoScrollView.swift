@@ -55,8 +55,8 @@ class PhotoPickerBrowserPhotoScrollView: UIScrollView,UIScrollViewDelegate,Photo
         // 点击手势视图
         tapView = PhotoPickerBrowserPhotoTouchView(frame: self.bounds)
         tapView.touchDelegate = self
-        tapView.autoresizingMask = [UIViewAutoresizing.FlexibleHeight, UIViewAutoresizing.FlexibleWidth]
-        tapView.backgroundColor = UIColor.blackColor()
+        tapView.autoresizingMask = [UIViewAutoresizing.flexibleHeight, UIViewAutoresizing.flexibleWidth]
+        tapView.backgroundColor = UIColor.black
         self.addSubview(tapView)
         
         // ImageView
@@ -66,22 +66,22 @@ class PhotoPickerBrowserPhotoScrollView: UIScrollView,UIScrollViewDelegate,Photo
 //        photoImageView.autoresizingMask = .FlexibleWidth
 //        photoImageView.autoresizingMask = .FlexibleHeight
 //        photoImageView.clipsToBounds = true;
-        photoImageView.backgroundColor = UIColor.blackColor()
+        photoImageView.backgroundColor = UIColor.black
         self.addSubview(photoImageView)
         
         // 滚动视图
-        self.backgroundColor = UIColor.blackColor()
+        self.backgroundColor = UIColor.black
         self.delegate = self
         self.showsVerticalScrollIndicator = false
         self.showsHorizontalScrollIndicator = false
         self.decelerationRate = UIScrollViewDecelerationRateFast
-        self.autoresizingMask = [UIViewAutoresizing.FlexibleHeight, UIViewAutoresizing.FlexibleWidth]
+        self.autoresizingMask = [UIViewAutoresizing.flexibleHeight, UIViewAutoresizing.flexibleWidth]
         self.zoomScale = 1
         self.minimumZoomScale = 1.0
         self.maximumZoomScale = 2.0
         
         // 添加手势
-        let longGesTure = UILongPressGestureRecognizer(target: self, action: #selector(PhotoPickerBrowserPhotoScrollView.longGesture(_:)))
+        let longGesTure = UILongPressGestureRecognizer(target: self, action: Selector(("longGesture:")))
         
         self.addGestureRecognizer(longGesTure)
 
@@ -95,7 +95,7 @@ class PhotoPickerBrowserPhotoScrollView: UIScrollView,UIScrollViewDelegate,Photo
     }
     
     //MARK: - UIScrollViewDelegate
-    func scrollViewDidZoom(scrollView: UIScrollView) {
+    func scrollViewDidZoom(_ scrollView: UIScrollView) {
         
         //if self.isClickDoubleTap == true {
             
@@ -106,7 +106,7 @@ class PhotoPickerBrowserPhotoScrollView: UIScrollView,UIScrollViewDelegate,Photo
                 (scrollView.height() - scrollView.contentSize.height) / 2.0 : 0.0;
             
             
-            self.photoImageView.center = CGPointMake(scrollView.contentSize.width / 2.0 + offsetX,
+        self.photoImageView.center = CGPoint(x: scrollView.contentSize.width / 2.0 + offsetX,y:
                                                      scrollView.contentSize.height / 2.0 + offsetY);
 //        } else {
 //            
@@ -118,7 +118,7 @@ class PhotoPickerBrowserPhotoScrollView: UIScrollView,UIScrollViewDelegate,Photo
 //        
 //        //print("scrollViewDidEndDecelerating")
 //    }
-    func scrollViewDidEndZooming(scrollView: UIScrollView, withView view: UIView?, atScale scale: CGFloat) {
+    func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
         
         if scale <= 1 {
             
@@ -129,7 +129,7 @@ class PhotoPickerBrowserPhotoScrollView: UIScrollView,UIScrollViewDelegate,Photo
         }
         
     }
-    func viewForZoomingInScrollView(scrollView: UIScrollView) -> UIView? {
+    private func viewForZoomingInScrollView(scrollView: UIScrollView) -> UIView? {
         
         return self.photoImageView
     }
@@ -152,26 +152,26 @@ class PhotoPickerBrowserPhotoScrollView: UIScrollView,UIScrollViewDelegate,Photo
         }
 
         self.isClickDoubleTap = true
-        self.handleDoubleTapClick(self.isZoomBig)
+        self.handleDoubleTapClick(isZoom: self.isZoomBig)
         
 
     }
     func singleTapImageView(imageView: UIImageView, touch: UITouch) {
         print("22")
-        browerPhotoScrollViewDelegate.pickerPhotoScrollViewDidSingleClick(photoImageView)
+        browerPhotoScrollViewDelegate.pickerPhotoScrollViewDidSingleClick(browserPhotoScrollView: photoImageView)
 
     }
     //MARK: - PhotoPickerBrowserPhotoTouchView
     func singleTapView(view: UIView, touch: UITouch)
     {
         print("33")
-        browerPhotoScrollViewDelegate.pickerPhotoScrollViewDidSingleClick(photoImageView)
+        browerPhotoScrollViewDelegate.pickerPhotoScrollViewDidSingleClick(browserPhotoScrollView: photoImageView)
 
     }
     func doubleTapView(view: UIView, touch: UITouch)
     {
         print("44")
-        self.handleDoubleTapClick(self.isZoomBig)
+        self.handleDoubleTapClick(isZoom: self.isZoomBig)
 
 //        var touchX: CGFloat = touch.locationInView(view).x
 //        var touchY: CGFloat = touch.locationInView(view).y

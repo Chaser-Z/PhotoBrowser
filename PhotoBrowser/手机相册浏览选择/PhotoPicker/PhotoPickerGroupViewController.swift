@@ -16,7 +16,8 @@ class PhotoPickerGroupViewController: UIViewController,UITableViewDelegate,UITab
     
     var groupTableView: UITableView!
     var groupsArray: Array<PhotoModel>!
-
+    // 是否授权访问
+    var isAuthorization: Bool!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,11 +28,11 @@ class PhotoPickerGroupViewController: UIViewController,UITableViewDelegate,UITab
         
 
         let navigationBarappearace = UINavigationBar.appearance()
-        navigationBarappearace.translucent = false
-        navigationBarappearace.barTintColor = UIColor.yellowColor()
+        navigationBarappearace.isTranslucent = false
+        navigationBarappearace.barTintColor = UIColor.yellow
         
         
-        let rightItem = UIBarButtonItem.init(title: "取消", style: .Plain, target: self, action: #selector(PhotoPickerGroupViewController.addApp(_:)))
+        let rightItem = UIBarButtonItem.init(title: "取消", style: .plain, target: self, action: #selector(PhotoPickerGroupViewController.addApp(_:)))
         self.navigationItem.rightBarButtonItem = rightItem;
 
         
@@ -46,31 +47,30 @@ class PhotoPickerGroupViewController: UIViewController,UITableViewDelegate,UITab
         
         self.groupsArray = []
         
-        self.view.backgroundColor = UIColor.yellowColor()
+        self.view.backgroundColor = UIColor.yellow
         
         let author = PHPhotoLibrary.authorizationStatus()
         //let author = ALAssetsLibrary.authorizationStatus()
-        PHAuthorizationStatus.Restricted
-        if author == PHAuthorizationStatus.Restricted || author == .Denied
+        if author == PHAuthorizationStatus.restricted || author == .denied
         {
             print("访问权限被关闭了，请前往设置->隐私->照片中设定")
         }
         else
         {
-            self.tableView()
+            self.createTableView()
             self.getAllImage()
         }
 
     }
-    func addApp(sender:UIBarButtonItem){
+    func addApp(_ sender:UIBarButtonItem){
         
-        self.dismissViewControllerAnimated(true, completion: nil)
+        self.dismiss(animated: true, completion: nil)
         //self.navigationController?.popViewControllerAnimated(true)
     }
     
     private func addNavBarCancelButton()
     {
-        let temporaryBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Cancel, target: self, action: #selector(self.testbtn))
+        let temporaryBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(self.testbtn))
         self.navigationItem.rightBarButtonItem = temporaryBarButtonItem
     }
     func testbtn()
@@ -78,18 +78,27 @@ class PhotoPickerGroupViewController: UIViewController,UITableViewDelegate,UITab
        print("111111")
     }
     //MARK: - 创建tableview
-    private func tableView() -> UITableView
+    func createTableView() -> UITableView
     {
         if (self.groupTableView == nil)
         {
-            self.groupTableView = UITableView(frame: CGRectMake(0, 0, self.view.frame.width, self.view.frame.height - 64), style: .Plain)
-            self.groupTableView.separatorStyle = .None
+            self.groupTableView = UITableView(frame: CGRect(x: 0,y: 0,width: self.view.frame.width,height: self.view.frame.height - 64), style: .plain)
+            self.groupTableView.separatorStyle = .none
             self.groupTableView.delegate = self
             self.groupTableView.dataSource = self
             self.view.addSubview(self.groupTableView)
         }
         return self.groupTableView
     }
+    
+//    class func fetchAllLocalIdentifiersOfPhotos(completion : (_ localIdentifiers : [String]) -> ()) {
+//        
+//        let userAlbum = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .albumRegular, options: nil)
+//        userAlbum.enumerateObjects ({ _,_,_ in
+//            
+//        })
+//        
+//    }
     //MARK: - 获取图片
     private func getAllImage()
     {
@@ -97,11 +106,17 @@ class PhotoPickerGroupViewController: UIViewController,UITableViewDelegate,UITab
         let albumOptions = PHFetchOptions()
         albumOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
         
-        let userAlbum = PHAssetCollection.fetchAssetCollectionsWithType(.SmartAlbum, subtype: .AlbumRegular, options: nil)
+        let userAlbum = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .albumRegular, options: nil)
         
-        userAlbum.enumerateObjectsUsingBlock { (collection, index, stop) -> Void in
-            let coll = collection as! PHAssetCollection
-            let assert = PHAsset.fetchAssetsInAssetCollection(coll, options: nil)
+        
+        
+        
+        
+        
+        userAlbum.enumerateObjects (
+            { (collection, index, stop) -> Void in
+            let coll = collection 
+            let assert = PHAsset.fetchAssets(in: coll, options: nil)
             
             if assert.count > 0 {
                 
@@ -138,45 +153,44 @@ class PhotoPickerGroupViewController: UIViewController,UITableViewDelegate,UITab
  
                     
                 }
-                let model = PhotoModel(title: coll.localizedTitle!, count: assert.count, fetchResult: assert, assetCollection: collection)
+                let model = PhotoModel(title: coll.localizedTitle!, count: assert.count, fetchResult: assert as! PHFetchResult<AnyObject>, assetCollection: collection)
                 
                 
                 self.groupsArray.append(model)
  
             }
-        }
+        })
         
-        let userCollection = PHCollectionList.fetchTopLevelUserCollectionsWithOptions(nil)
+        let userCollection = PHCollectionList.fetchTopLevelUserCollections(with: nil)
         
-        userCollection.enumerateObjectsUsingBlock { (list, index, stop) -> Void in
+        userCollection.enumerateObjects ({ (list, index, stop) -> Void in
             let list = list as! PHAssetCollection
-            let assert = PHAsset.fetchAssetsInAssetCollection(list, options: nil)
+            let assert = PHAsset.fetchAssets(in: list, options: nil)
             if assert.count > 0 {
                 
-                let ass = assert[0] as! PHAsset
+                let ass = assert[0] 
                 print("mediaType = \(ass.mediaType)")
-                let model = PhotoModel(title: list.localizedTitle!, count: assert.count, fetchResult: assert,assetCollection: list)
+                let model = PhotoModel(title: list.localizedTitle!, count: assert.count, fetchResult: assert as! PHFetchResult<AnyObject>,assetCollection: list)
                 self.groupsArray.append(model)
 
             }
-        }
+        })
         
-
 
         //print(self.groupsArray)
     
         
     }
     //MARK: - UITableViewDataSource
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         
         return self.groupsArray.count
     }
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        tableView.registerClass(GroupsCell.self, forCellReuseIdentifier: "cell")
-        let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as! GroupsCell
+        tableView.register(GroupsCell.self, forCellReuseIdentifier: "cell")
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath as IndexPath) as! GroupsCell
         
         
         cell.model = self.groupsArray[indexPath.row]
@@ -184,10 +198,10 @@ class PhotoPickerGroupViewController: UIViewController,UITableViewDelegate,UITab
         
     }
     //MARK: - UITableViewDelegate
-    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 60
     }
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath)
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath)
     {
         
         let model = self.groupsArray[indexPath.row]

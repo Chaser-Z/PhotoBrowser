@@ -54,7 +54,7 @@ class ViewController: UIViewController {
         for i in 0 ..< 9
         {
            let imageStr = String(format: "pic%d.jpg", i)
-            imageArray.append(imageStr)
+            imageArray.append(imageStr as AnyObject)
         }
         
         // 每一格的尺寸
@@ -74,9 +74,9 @@ class ViewController: UIViewController {
             let cellY:CGFloat = 100 + CGFloat(row) * (cellH + margin)
 
             
-            let imageView = UIImageView(frame: CGRectMake(cellX, cellY, cellW, cellH))
+            let imageView = UIImageView(frame: CGRect(x: cellX,y: cellY,width: cellW,height: cellH))
             //print("imageView.frame = \(imageView.frame)")
-            imageView.userInteractionEnabled = true
+            imageView.isUserInteractionEnabled = true
             imageView.image = UIImage(named:  imageArray[i] as! String)
             
             
@@ -85,8 +85,8 @@ class ViewController: UIViewController {
             // tag设置为i（暂时固定，可以后期修改）
             imageView.tag = i
             
-            self.view.addSubview(imageView)
-            let  tapGesture = UITapGestureRecognizer(target: self, action: #selector(ViewController.tapImageGesture(_:)))
+            //self.view.addSubview(imageView)
+            let  tapGesture = UITapGestureRecognizer(target: self, action: Selector(("tapImageGesture:")))
             imageView.addGestureRecognizer(tapGesture)
         }
          
@@ -95,39 +95,39 @@ class ViewController: UIViewController {
         
         
         
-        let button = UIButton(type: .Custom)
-        button.frame = CGRectMake(0, 60, self.view.width(), 30)
-        button.addTarget(self, action: #selector(ViewController.btnClick), forControlEvents: .TouchUpInside)
-        button.setTitle("下一页", forState: UIControlState.Normal)
-        button.backgroundColor = UIColor.blueColor()
+        let button = UIButton(type: .custom)
+        button.frame = CGRect(x:0,y: 60,width: self.view.width(),height: 30)
+        button.addTarget(self, action:#selector(ViewController.btnClick), for: .touchUpInside)
+        button.setTitle("下一页", for: UIControlState.normal)
+        button.backgroundColor = UIColor.blue
         self.view.addSubview(button)
         
         
-        let button1 = UIButton(type: .Custom)
-        button1.frame = CGRectMake(100, self.view.height() - 70,30, 30)
-        button1.addTarget(self, action: #selector(ViewController.click), forControlEvents: .TouchUpInside)
+        let button1 = UIButton(type: .custom)
+        button1.frame = CGRect(x:100,y: self.view.height() - 70,width: 30,height: 30)
+        button1.addTarget(self, action: #selector(ViewController.click(_:)), for: .touchUpInside)
         
-        button1.setImage(UIImage(named: "CellGreySelected"), forState: .Normal)
+        button1.setImage(UIImage(named: "CellGreySelected"), for: .normal)
         self.view.addSubview(button1)
 
 
         
     }
-    func click(btn: UIButton)
+    func click(_ btn: UIButton)
     {
-        btn.selected = !btn.selected
+        btn.isSelected = !btn.isSelected
         
-        if btn.selected == false {
+        if btn.isSelected == false {
             
             print("111")
-            btn.setImage(UIImage(named: "CellGreySelected"), forState: .Normal)
+            btn.setImage(UIImage(named: "CellGreySelected"), for: .normal)
             //btn.addAnimation(0.3)
 
         } else {
            
             print("222")
-            btn.addAnimation(0.3)
-            btn.setImage(UIImage(named: "CellBlueSelected"), forState: .Normal)
+            btn.addAnimation(durationTime: 0.3)
+            btn.setImage(UIImage(named: "CellBlueSelected"), for: .normal)
 
         }
         
@@ -141,11 +141,11 @@ class ViewController: UIViewController {
         vc = PhotoPickerGroupViewController()
         self.nav = UINavigationController(rootViewController: vc)
 
-        self.presentViewController(self.nav, animated: false, completion: nil)
+        self.present(self.nav, animated: false, completion: nil)
     }
     func tapImageGesture(tapGesture: UITapGestureRecognizer)
     {
-        PhotoBrowser.show(self.imageArray, index: tapGesture.view!.tag, item: tapGesture.view!, column: 3,type:ImageType.Local, showView: self.view)
+        PhotoBrowser.show(imagesArray: self.imageArray, index: tapGesture.view!.tag, item: tapGesture.view!, column: 3,type:ImageType.Local, showView: self.view)
     }
 
     override func didReceiveMemoryWarning() {

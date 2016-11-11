@@ -22,17 +22,17 @@ class PickerCollectionViewCell: UICollectionViewCell {
     private func setUI()
     {
         photoImageView = UIImageView(frame: self.contentView.bounds)
-        photoImageView.autoresizingMask = .FlexibleWidth
-        photoImageView.autoresizingMask = .FlexibleHeight
-        photoImageView.contentMode =  .ScaleAspectFill
+        photoImageView.autoresizingMask = .flexibleWidth
+        photoImageView.autoresizingMask = .flexibleHeight
+        photoImageView.contentMode =  .scaleAspectFill
         photoImageView.clipsToBounds = true;
         self.contentView .addSubview(photoImageView)
         
         
-        self.selectBtn = UIButton(type: .Custom)
-        self.selectBtn.frame = CGRectMake(self.contentView.frame.size.width - 30 - 2, 2, 30, 30)
-        self.selectBtn.setImage(UIImage(named: "CellGreySelected"), forState: .Normal)
-        self.selectBtn.setImage(UIImage(named: "CellBlueSelected"), forState: .Selected)
+        self.selectBtn = UIButton(type: .custom)
+        self.selectBtn.frame = CGRect(x: self.contentView.frame.size.width - 30 - 2,y: 2,width: 30,height: 30)
+        self.selectBtn.setImage(UIImage(named: "CellGreySelected"), for: .normal)
+        self.selectBtn.setImage(UIImage(named: "CellBlueSelected"), for: .selected)
         self.contentView.addSubview(self.selectBtn)
 
         

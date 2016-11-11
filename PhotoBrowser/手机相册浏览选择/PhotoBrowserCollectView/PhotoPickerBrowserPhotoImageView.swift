@@ -31,34 +31,34 @@ class PhotoPickerBrowserPhotoImageView: UIImageView {
     override init(frame: CGRect) {
         
         super.init(frame: frame)
-        self.userInteractionEnabled = true
+        self.isUserInteractionEnabled = true
         // 添加手势
         self.addGesTure()
     }
     //MARK: - 添加手势
     private func addGesTure()
     {
-        self.contentMode = .ScaleAspectFit
+        self.contentMode = .scaleAspectFit
         // 退出手势
-        self.exitTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleExitGesture(_:)));
+        self.exitTapGesture = UITapGestureRecognizer(target: self, action:#selector(PhotoPickerBrowserPhotoImageView.handleExitGesture(_:)));
         self.addGestureRecognizer(exitTapGesture);
         // 双击手势
-        self.tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleTapGesture(_:)));
+        self.tapGesture = UITapGestureRecognizer(target: self, action: #selector(PhotoPickerBrowserPhotoImageView.handleTapGesture(_:)));
         self.tapGesture.numberOfTapsRequired = 2;
         self.addGestureRecognizer(tapGesture);
         // 关键在这一行，如果双击确定偵測失败才會触发单击
-        self.exitTapGesture.requireGestureRecognizerToFail(tapGesture);
+        self.exitTapGesture.require(toFail: tapGesture);
 
     }
     //MARK: - 退出手势
-    func handleExitGesture(sender: UITouch)
+    func handleExitGesture(_ sender: UITouch)
     {
-        browserPhotoImageViewDelegate.singleTapImageView(self, touch: sender)
+        browserPhotoImageViewDelegate.singleTapImageView(imageView: self, touch: sender)
     }
     //MARK: - 双击手势
-    func handleTapGesture(sender: UITouch)
+    func handleTapGesture(_ sender: UITouch)
     {
-        browserPhotoImageViewDelegate.doubleTapimageView(self, touch: sender)
+        browserPhotoImageViewDelegate.doubleTapimageView(imageView: self, touch: sender)
     }
     
     

@@ -13,20 +13,20 @@ class ShowPhotoViewController: UIViewController,UIImagePickerControllerDelegate,
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.view.backgroundColor = UIColor.whiteColor()
-        let button = UIButton(type: .Custom)
-        button.frame = CGRectMake(0, 60, self.view.width(), 30)
-        button.addTarget(self, action: #selector(ShowPhotoViewController.btnClick), forControlEvents: .TouchUpInside)
-        button.setTitle("上一页", forState: UIControlState.Normal)
-        button.backgroundColor = UIColor.blueColor()
+        self.view.backgroundColor = UIColor.white
+        let button = UIButton(type: .custom)
+        button.frame = CGRect(x: 0,y: 60,width: self.view.width(),height: 30)
+        button.addTarget(self, action: #selector(ShowPhotoViewController.btnClick), for: .touchUpInside)
+        button.setTitle("上一页", for: UIControlState.normal)
+        button.backgroundColor = UIColor.blue
         self.view.addSubview(button)
         
         
-        let photoButton = UIButton(type: .Custom)
-        photoButton.frame = CGRectMake(0, 200, self.view.width(), 40)
-        photoButton.addTarget(self, action: #selector(ShowPhotoViewController.photoClick), forControlEvents: .TouchUpInside)
-        photoButton.setTitle("调用相册", forState: UIControlState.Normal)
-        photoButton.backgroundColor = UIColor.blueColor()
+        let photoButton = UIButton(type: .custom)
+        photoButton.frame = CGRect(x: 0,y: 200,width: self.view.width(),height: 40)
+        photoButton.addTarget(self, action: #selector(ShowPhotoViewController.photoClick), for: .touchUpInside)
+        photoButton.setTitle("调用相册", for: UIControlState.normal)
+        photoButton.backgroundColor = UIColor.blue
         self.view.addSubview(photoButton)
 
 
@@ -34,7 +34,7 @@ class ShowPhotoViewController: UIViewController,UIImagePickerControllerDelegate,
     }
     func btnClick()
     {
-        self.dismissViewControllerAnimated(true) { 
+        self.dismiss(animated: true) { 
             
         }
     }
@@ -43,9 +43,9 @@ class ShowPhotoViewController: UIViewController,UIImagePickerControllerDelegate,
         if self.isPhotoLibraryAvailable()
         {
             let pickController = UIImagePickerController()
-            pickController.sourceType = .PhotoLibrary
+            pickController.sourceType = .photoLibrary
             pickController.delegate = self
-            self.presentViewController(pickController, animated: true, completion: { 
+            self.present(pickController, animated: true, completion: { 
                 
             })
         }
@@ -54,7 +54,7 @@ class ShowPhotoViewController: UIViewController,UIImagePickerControllerDelegate,
     
     private func isPhotoLibraryAvailable() -> Bool
     {
-        return UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.PhotoLibrary)
+        return UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.photoLibrary)
     }
 
     override func didReceiveMemoryWarning() {

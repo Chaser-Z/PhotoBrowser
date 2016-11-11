@@ -18,20 +18,21 @@ protocol PickerCollectionViewDelegate {
 
 class PickerCollectionView: UICollectionView, UICollectionViewDelegate,UICollectionViewDataSource {
     
-    var dataArray: PHFetchResult!
+    
+    var dataArray: PHFetchResult<AnyObject>!
     var imageArray: Array<PHAsset>!
     /** 获取的高清图 */
     var highImage: UIImage!
     /** 选中的图片 */
     var selectPhotosArray = NSMutableArray()
     /** 闭包 */
-    var photosTransitiveClosures: ((photoArray: NSMutableArray) -> Void)?
+    var photosTransitiveClosures: ((_ photoArray: NSMutableArray) -> Void)?
     /** 选择的图片的index  */
     lazy var selectPhotoNumbersArray: NSMutableArray = {
         
         var array = NSMutableArray()
         for i in 0 ..< self.imageArray.count{
-            array.addObject("1")
+            array.add("1")
         }
         return array
     }()
@@ -41,17 +42,17 @@ class PickerCollectionView: UICollectionView, UICollectionViewDelegate,UICollect
     override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
         
         super.init(frame: frame, collectionViewLayout: layout)
-        self.backgroundColor = UIColor.clearColor()
+        self.backgroundColor = UIColor.clear
         self.dataSource = self
         self.delegate = self
         
         // 通知
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PickerCollectionView.receiveNotic(_:)), name: "changeSelectButton", object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(PickerCollectionView.receiveNotic(_:)), name: NSNotification.Name(rawValue: "changeSelectButton"), object: nil)
 
         
     }
     //MARK: - 接收通知并刷新状态
-    func receiveNotic(notic: NSNotification) {
+    func receiveNotic(_ notic: NSNotification) {
         
         
         let objectArray: NSMutableArray = notic.object as! NSMutableArray
@@ -69,17 +70,17 @@ class PickerCollectionView: UICollectionView, UICollectionViewDelegate,UICollect
 
     
     //MARK: - UICollectionViewDataSource
-    func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
+    private func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
         
         return 1
     }
-    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
         return self.imageArray.count
     }
-    func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("cell", forIndexPath: indexPath) as! PickerCollectionViewCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath as IndexPath) as! PickerCollectionViewCell
         
  
         // 获取图片像素
@@ -88,43 +89,43 @@ class PickerCollectionView: UICollectionView, UICollectionViewDelegate,UICollect
         return cell
         
     }
-    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
        
         //print(indexPath.row)
-        self.pickerDelegate.pickerCollectionCellSelectIndexPath(indexPath)
+        self.pickerDelegate.pickerCollectionCellSelectIndexPath(indexPath: indexPath as NSIndexPath)
         
 
     }
     // MARK: - 获取图片清晰程度
-    private func getImagePixels(index index: Int,isHitgQualityImage: Bool,cell: PickerCollectionViewCell?,btn: UIButton?) {
+    private func getImagePixels(index: Int,isHitgQualityImage: Bool,cell: PickerCollectionViewCell?,btn: UIButton?) {
         
-        let scale = UIScreen.mainScreen().scale
+        let scale = UIScreen.main.scale
         var size: CGSize!
         let asset = self.imageArray[index]
         // 如果清晰图
         if isHitgQualityImage == true {
             
             // 可以这样获取原图
-           size  = CGSizeMake(CGFloat(asset.pixelWidth), CGFloat(asset.pixelHeight))
+            size  = CGSize(width: CGFloat(asset.pixelWidth),height: CGFloat(asset.pixelHeight))
             //size = CGSizeMake(self.frame.width  , self.frame.height)
             
         } else {
             
-            size = CGSizeMake(CELL_W * scale, CELL_W * scale)
+            size = CGSize(width: CELL_W * scale,height: CELL_W * scale)
         }
         
         
         let initialRequestOptions = PHImageRequestOptions()
         // 是否同步请求，设置为false，否则会很卡
-        initialRequestOptions.synchronous = false
+        initialRequestOptions.isSynchronous = false
         // Fast - 快速
-        initialRequestOptions.resizeMode = .Fast
+        initialRequestOptions.resizeMode = .fast
         // HighQualityFormat - 图片高质量
-        initialRequestOptions.deliveryMode = .HighQualityFormat
+        initialRequestOptions.deliveryMode = .highQualityFormat
         // 是否允许网络请求
-        initialRequestOptions.networkAccessAllowed = false
+        initialRequestOptions.isNetworkAccessAllowed = false
         
-        imageManager.requestImageForAsset(asset, targetSize: size, contentMode: .AspectFill, options: initialRequestOptions) { (result, info) in
+        imageManager.requestImage(for: asset, targetSize: size, contentMode: .aspectFill, options: initialRequestOptions) { (result, info) in
             
             //print("row = \(indexPath.row) resutl = \(result)")
             // 如果是cell获取的图片
@@ -133,13 +134,13 @@ class PickerCollectionView: UICollectionView, UICollectionViewDelegate,UICollect
                 cell!.photoImageView.image = result
                 
                 cell!.selectBtn.tag = index
-                cell!.selectBtn.addTarget(self, action: #selector(PickerCollectionView.click(_:)), forControlEvents: .TouchUpInside)
+                cell!.selectBtn.addTarget(self, action: #selector(PickerCollectionView.click(_:)), for: .touchUpInside)
                 if self.selectPhotoNumbersArray[index] as! String == "2" {
                     
-                    cell!.selectBtn.selected = true
+                    cell!.selectBtn.isSelected = true
                     
                 } else {
-                    cell!.selectBtn.selected = false
+                    cell!.selectBtn.isSelected = false
                 }
 
                 
@@ -150,22 +151,22 @@ class PickerCollectionView: UICollectionView, UICollectionViewDelegate,UICollect
                 
 
                 
-                btn!.selected = !btn!.selected
+                btn!.isSelected = !btn!.isSelected
                 
-                if btn!.selected == false {
+                if btn!.isSelected == false {
                     
                     for i in 0 ..< self.selectPhotosArray.count {
                         
                         let model: PhotoSampleModel = self.selectPhotosArray[i] as! PhotoSampleModel
                         if model.index == btn?.tag {
                            
-                            self.selectPhotosArray.removeObject(model)
+                            self.selectPhotosArray.remove(model)
                             break
 
                         }
                     }
                     
-                    self.selectPhotoNumbersArray.replaceObjectAtIndex(btn!.tag, withObject: "1")
+                    self.selectPhotoNumbersArray.replaceObject(at: btn!.tag, with: "1")
                     
                 } else {
                     
@@ -174,13 +175,13 @@ class PickerCollectionView: UICollectionView, UICollectionViewDelegate,UICollect
                     model.image = result
                     model.index = btn?.tag
                     
-                    btn!.addAnimation(0.3)
-                    self.selectPhotoNumbersArray.replaceObjectAtIndex(btn!.tag, withObject: "2")
-                    self.selectPhotosArray.addObject(model)
+                    btn!.addAnimation(durationTime: 0.3)
+                    self.selectPhotoNumbersArray.replaceObject(at: btn!.tag, with: "2")
+                    self.selectPhotosArray.add(model)
                     
                 }
 
-                self.photosTransitiveClosures!(photoArray: self.selectPhotosArray)
+                self.photosTransitiveClosures!(self.selectPhotosArray)
             }
             
             
@@ -190,7 +191,7 @@ class PickerCollectionView: UICollectionView, UICollectionViewDelegate,UICollect
         
     }
     //MARK: - 对勾按钮点击事件
-    func click(btn: UIButton)
+    func click(_ btn: UIButton)
     {
         // 获取图片像素（这里获取的是高清图）
         self.getImagePixels(index: btn.tag, isHitgQualityImage: true, cell: nil,btn: btn)

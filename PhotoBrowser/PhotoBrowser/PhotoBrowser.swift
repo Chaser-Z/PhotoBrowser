@@ -11,7 +11,7 @@ import UIKit
 // 协议
 @objc protocol GestureImageViewDelegate {
     
-    optional func gestureImageViewExit()
+    @objc optional func gestureImageViewExit()
 }
 
 class GestureImageView: UIImageView {
@@ -37,7 +37,7 @@ class GestureImageView: UIImageView {
     
     private func createUI()
     {
-        self.userInteractionEnabled = true;
+        self.isUserInteractionEnabled = true;
         // 退出手势
         self.exitTapGesture = UITapGestureRecognizer(target: self, action: #selector(GestureImageView.handleExitGesture(_:)));
         self.addGestureRecognizer(exitTapGesture);
@@ -46,11 +46,11 @@ class GestureImageView: UIImageView {
         self.tapGesture.numberOfTapsRequired = 2;
         self.addGestureRecognizer(tapGesture);
         // 关键在这一行，如果双击确定偵測失败才會触发单击
-        self.exitTapGesture.requireGestureRecognizerToFail(tapGesture);
+        self.exitTapGesture.require(toFail: tapGesture);
 
     }
     //MARK: - 退出手势
-    func handleExitGesture(sender: UITapGestureRecognizer)
+    func handleExitGesture(_ sender: UITapGestureRecognizer)
     {
         //print("\(sender.view)")
 
@@ -60,7 +60,7 @@ class GestureImageView: UIImageView {
         self.delegate?.gestureImageViewExit?();
     }
     //MARK: - 双击手势
-    func handleTapGesture(sender: UITapGestureRecognizer)
+    func handleTapGesture(_ sender: UITapGestureRecognizer)
     {
         
         print(self.superview)
@@ -124,7 +124,7 @@ class PhotoBrowser: UIView, UIScrollViewDelegate, GestureImageViewDelegate {
     //MARK: - 展示图片浏览器
     class func show(imagesArray: [AnyObject],index: Int, item: UIView, column: Int,type: ImageType,showView: UIView) ->PhotoBrowser {
         
-        return PhotoBrowser(frame: UIScreen.mainScreen().bounds, imagesArray: imagesArray, index: index, rect: item.convertRect(item.bounds, toView: (UIApplication.sharedApplication().delegate?.window)!), column: column,type: type,showView: showView)
+        return PhotoBrowser(frame: UIScreen.main.bounds, imagesArray: imagesArray, index: index, rect: item.convert(item.bounds, to: (UIApplication.shared.delegate?.window)!), column: column,type: type,showView: showView)
         
     }
     //MARK: - 初始化
@@ -150,12 +150,12 @@ class PhotoBrowser: UIView, UIScrollViewDelegate, GestureImageViewDelegate {
     private func layoutUI()
     {
         // 背景View
-        self.backgroundView = UIView(frame: UIScreen.mainScreen().bounds)
-        self.backgroundView.backgroundColor = UIColor.blackColor()
+        self.backgroundView = UIView(frame: UIScreen.main.bounds)
+        self.backgroundView.backgroundColor = UIColor.black
         self.backgroundView.alpha = 0
-        UIApplication.sharedApplication().delegate?.window??.addSubview(self.backgroundView)
+        UIApplication.shared.delegate?.window??.addSubview(self.backgroundView)
         
-        self.backgroundColor = UIColor.clearColor()
+        self.backgroundColor = UIColor.clear
         
         // 滚动视图
         self.mainScrollView = UIScrollView(frame: self.bounds)
@@ -171,12 +171,12 @@ class PhotoBrowser: UIView, UIScrollViewDelegate, GestureImageViewDelegate {
         if  self.imagesArray.count > 0
         {
             // swift提供一个enumerate函数来遍历数组，会同时返回数据项和索引值
-            for (i ,image) in self.imagesArray.enumerate()
+            for (i ,image) in self.imagesArray.enumerated()
             {
             
                 
                 // 创建滚动视图
-                let imageScrollView = UIScrollView(frame: CGRectMake(CGFloat(i) * self.width(),0,self.width(),self.height()))
+                let imageScrollView = UIScrollView(frame: CGRect(x: CGFloat(i) * self.width(),y: 0,width: self.width(),height: self.height()))
                 imageScrollView.bounces = false
                 // 创建imageView
                 let imageView = GestureImageView(frame: imageScrollView.bounds)
@@ -193,11 +193,11 @@ class PhotoBrowser: UIView, UIScrollViewDelegate, GestureImageViewDelegate {
                 // 把imageView添加到滚动视图上
                imageScrollView.addSubview(imageView);
                 imageScrollView.delegate = self
-                imageScrollView.multipleTouchEnabled = true
+                imageScrollView.isMultipleTouchEnabled = true
                 // 设置最大最小缩放
                 imageScrollView.minimumZoomScale = 1.0
                 imageScrollView.maximumZoomScale = 2.5
-                imageScrollView.backgroundColor = UIColor.clearColor()
+                imageScrollView.backgroundColor = UIColor.clear
                 imageScrollView.tag = i
                 // 添加到主滚动视图上
                 self.mainScrollView.addSubview(imageScrollView)
@@ -228,7 +228,8 @@ class PhotoBrowser: UIView, UIScrollViewDelegate, GestureImageViewDelegate {
                         imageView.setHeight(imageObject.size.height)
                     }
                     // 调整位置
-                    imageView.setXy(CGPointMake((imageScrollView.width() - imageView.width()) / 2.0, (imageScrollView.height() - imageView.height()) / 2.0))
+                    imageView.setXy(CGPoint(x: (imageScrollView.width() - imageView.width()) / 2.0, y: (imageScrollView.height() - imageView.height()) / 2.0))
+                    
                     
                     imageView.image = imageObject
 
@@ -248,7 +249,7 @@ class PhotoBrowser: UIView, UIScrollViewDelegate, GestureImageViewDelegate {
             if self.imageType == ImageType.Net
             {
                 
-                self.layoutNetImageViewSize(self.currentImageView,imageStr: self.imagesArray[self.currentIndex] as! String,imageScrollView: self.currentScrollView)
+                self.layoutNetImageViewSize(imageView: self.currentImageView,imageStr: self.imagesArray[self.currentIndex] as! String,imageScrollView: self.currentScrollView)
                 
             }
 
@@ -262,18 +263,18 @@ class PhotoBrowser: UIView, UIScrollViewDelegate, GestureImageViewDelegate {
     //MARK: - 添加开始动画
     private func addBeginAnimation()
     {
-        self.mainScrollView.pagingEnabled = true
+        self.mainScrollView.isPagingEnabled = true
         // 偏移量
-        self.mainScrollView.contentSize = CGSizeMake(CGFloat(self.imagesArray.count) * self.mainScrollView.width(), self.height())
-        self.mainScrollView.setContentOffset(CGPointMake(CGFloat(self.index) * self.width(), 0), animated: false)
+        self.mainScrollView.contentSize = CGSize(width: CGFloat(self.imagesArray.count) * self.mainScrollView.width(), height: self.height())
+        self.mainScrollView.setContentOffset(CGPoint(x: CGFloat(self.index) * self.width(), y: 0), animated: false)
         // 把该图片浏览器放到主窗口上
-        UIApplication.sharedApplication().delegate?.window??.addSubview(self);
+        UIApplication.shared.delegate?.window??.addSubview(self);
         
         // 调整浏览图片后ImageView的位置
-        var rc = CGRectMake(0, 0, self.currentImageView.width(), self.currentImageView.height());
-        rc.origin = CGPointMake((self.width() - currentImageView.width()) / 2.0, (self.height() - currentImageView.height()) / 2.0);
+        var rc = CGRect(x: 0,y: 0,width: self.currentImageView.width(),height: self.currentImageView.height());
+        rc.origin = CGPoint(x: (self.width() - currentImageView.width()) / 2.0,y: (self.height() - currentImageView.height()) / 2.0);
         // 图片的高度大于页面高度
-        if self.currentImageView.image?.size.height >= self.height()
+        if (self.currentImageView.image?.size.height)! >= self.height()
         {
             // y坐标置为0
             rc.origin.y = 0
@@ -284,7 +285,7 @@ class PhotoBrowser: UIView, UIScrollViewDelegate, GestureImageViewDelegate {
         self.currentImageView.frame = self.rect;
         
         // 添加动画
-        UIView.animateWithDuration(zoomAniationTime, delay: 0, options: .CurveEaseIn, animations: { () -> Void in
+        UIView.animate(withDuration: zoomAniationTime, delay: 0, options: .curveEaseIn, animations: { () -> Void in
             
             // 图片在浏览器中的位置
             self.currentImageView.frame = rc;
@@ -299,7 +300,7 @@ class PhotoBrowser: UIView, UIScrollViewDelegate, GestureImageViewDelegate {
     private func layoutNetImageViewSize(imageView: GestureImageView,imageStr:String,imageScrollView: UIScrollView)
     {
         
-        imageView.sd_setImageWithURL(NSURL(string:  imageStr), placeholderImage: nil, options: .RetryFailed, progress:
+        imageView.sd_setImage(with: NSURL(string:  imageStr) as URL!, placeholderImage: nil, options: .retryFailed, progress:
             { (receivedSize, expectedSize) in
                 
                 print(receivedSize)
@@ -308,7 +309,6 @@ class PhotoBrowser: UIView, UIScrollViewDelegate, GestureImageViewDelegate {
             
             if (error != nil){
                 print(error.debugDescription)
-                print(error.description)
                 print("haha")
                 
             }
@@ -319,7 +319,7 @@ class PhotoBrowser: UIView, UIScrollViewDelegate, GestureImageViewDelegate {
                 let imageSize = imageView.image?.size
                 print(imageSize)
                 
-                var imageFrame = CGRectMake(0, 0, imageSize!.width, imageSize!.height)
+                var imageFrame = CGRect(x: 0,y: 0,width: imageSize!.width,height: imageSize!.height)
                 
                 let ratio = self.backgroundView.width() / imageFrame.size.width
                 imageFrame.size.height = imageFrame.size.height * ratio
@@ -328,16 +328,16 @@ class PhotoBrowser: UIView, UIScrollViewDelegate, GestureImageViewDelegate {
                 // 设置imageView的frame
                 imageView.frame = imageFrame
                 // 设置每个滚动视图的contentSize
-                imageScrollView.contentSize = CGSizeMake(0, imageView.height())
+                imageScrollView.contentSize = CGSize(width: 0,height: imageView.height())
                 
                 // 调整图片在滚动视图上的位置
-                imageView.setXy(CGPointMake((imageScrollView.width() - imageView.width()) / 2.0, (imageScrollView.height() - imageView.height()) / 2.0))
+                imageView.setXy(CGPoint(x: (imageScrollView.width() - imageView.width()) / 2.0,y: (imageScrollView.height() - imageView.height()) / 2.0))
                 // 如果图片高度大于视图高度
                 if imageView.height() >= self.height()
                 {
                     // 调整图片在滚动视图上的位置
                     
-                    imageView.setXy(CGPointMake((imageScrollView.width() - imageView.width()) / 2.0, 0))
+                    imageView.setXy(CGPoint(x: (imageScrollView.width() - imageView.width()) / 2.0,y: 0))
                     
                 }
 
@@ -382,7 +382,7 @@ class PhotoBrowser: UIView, UIScrollViewDelegate, GestureImageViewDelegate {
         self.currentImageView = subView?.viewWithTag(imageViewTag + self.currentIndex) as! GestureImageView
         
         // 隐藏currentImageView
-        self.currentImageView.hidden = true
+        self.currentImageView.isHidden = true
         
         // 新建中间tempView
         let tempView = UIImageView()
@@ -390,7 +390,7 @@ class PhotoBrowser: UIView, UIScrollViewDelegate, GestureImageViewDelegate {
         tempView.image = self.currentImageView.image
         
         let h = (self.width() / (self.currentImageView.image?.size.width)!) * (currentImageView.image?.size.height)!
-        tempView.bounds = CGRectMake(0, 0, self.width(), h)
+        tempView.bounds = CGRect(x: 0,y: 0,width: self.width(),height: h)
         tempView.center = self.center
         self .addSubview(tempView)
         
@@ -400,8 +400,8 @@ class PhotoBrowser: UIView, UIScrollViewDelegate, GestureImageViewDelegate {
         if self.showView is UICollectionView {
             
             let collectView = self.showView as! UICollectionView
-            let path = NSIndexPath(forItem: self.currentIndex, inSection: 0)
-            view = collectView.cellForItemAtIndexPath(path)
+            let path = IndexPath(item: self.currentIndex, section: 0)
+            view = collectView.cellForItem(at: path)
 
 
         }
@@ -411,9 +411,11 @@ class PhotoBrowser: UIView, UIScrollViewDelegate, GestureImageViewDelegate {
 
         }
         // 取得位置
-        let targetTemp: CGRect = self.showView.convertRect(view.frame, toView: self)
+        let targetTemp: CGRect = self.showView.convert(view.frame, to: self)
+        
+        
         //let rc = self.getExitRect()
-        UIView.animateWithDuration(zoomAniationTime, delay: 0, options: .CurveEaseOut, animations: {
+        UIView.animate(withDuration: zoomAniationTime, delay: 0, options: .curveEaseOut, animations: {
             
             self.backgroundView.alpha = 0
             tempView.frame = targetTemp
@@ -429,40 +431,40 @@ class PhotoBrowser: UIView, UIScrollViewDelegate, GestureImageViewDelegate {
     //MARK: - 结束为止（暂时不用）
     private func getExitRect() -> CGRect
     {
-        var rc = CGRectMake(0, 0, CGRectGetWidth(self.rect), CGRectGetHeight(self.rect))
-        var startRect = CGRectMake(0, 0, CGRectGetWidth(self.rect), CGRectGetHeight(self.rect))
+        var rc = CGRect(x: 0,y: 0,width: self.rect.width,height: self.rect.height)
+        var startRect = CGRect(x: 0,y: 0,width: self.rect.width,height: self.rect.height)
         if self.index < self.column
         {
-            startRect.origin.x = CGRectGetMinX(self.rect) - CGFloat(self.index) * CGRectGetWidth(self.rect)
-            startRect.origin.y = CGRectGetMinY(self.rect);
+            startRect.origin.x = self.rect.minX - CGFloat(self.index) * self.rect.width
+            startRect.origin.y = self.rect.minY;
         }
         else
         {
             let row = ((self.index + 1) / self.column + ((self.index + 1) % self.column != 0 ? 1 : 0) - 1);
             let col = ((self.index + 1) % self.column == 0 ? self.column : (self.index + 1) % self.column) - 1;
-            startRect.origin.x = CGRectGetMinX(self.rect) - CGFloat(col) * CGRectGetWidth(self.rect);
-            startRect.origin.y = CGRectGetMinY(self.rect) - CGFloat(row) * CGRectGetHeight(self.rect);
+            startRect.origin.x = self.rect.minX - CGFloat(col) * self.rect.width;
+            startRect.origin.y = self.rect.minY - CGFloat(row) * self.rect.height;
 
         }
         
         if self.currentIndex < self.column
         {
-            rc.origin.x = CGRectGetMinX(startRect) + CGFloat(self.currentIndex) * CGRectGetWidth(self.rect);
-            rc.origin.y = CGRectGetMinY(startRect);
+            rc.origin.x = startRect.minX + CGFloat(self.currentIndex) * self.rect.width;
+            rc.origin.y = startRect.minY;
         }
         else
         {
             let row = ((self.currentIndex + 1) / self.column + ((self.currentIndex + 1) % self.column != 0 ? 1 : 0) - 1);
             let col = ((self.currentIndex + 1) % self.column == 0 ? self.column : (self.currentIndex + 1) % self.column) - 1;
-            rc.origin.x = CGRectGetMinX(startRect) + CGFloat(col) * CGRectGetWidth(self.rect);
-            rc.origin.y = CGRectGetMinY(startRect) + CGFloat(row) * CGRectGetHeight(self.rect);
+            rc.origin.x = startRect.minX + CGFloat(col) * self.rect.width;
+            rc.origin.y = startRect.minY + CGFloat(row) * self.rect.height;
         }
         return rc;
 
         
     }
     //MARK: - UIScrollViewDelegate
-    func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
       
         if self.mainScrollView === scrollView
         {
@@ -489,14 +491,14 @@ class PhotoBrowser: UIView, UIScrollViewDelegate, GestureImageViewDelegate {
             // 加载网络图片
             if self.imageType == ImageType.Net
             {
-                self.layoutNetImageViewSize(self.currentImageView, imageStr: self.imagesArray[self.currentIndex] as! String, imageScrollView: self.currentScrollView)
+                self.layoutNetImageViewSize(imageView: self.currentImageView, imageStr: self.imagesArray[self.currentIndex] as! String, imageScrollView: self.currentScrollView)
 
             }
         }
 
     }
     // 当正在缩放的时候调用
-    func scrollViewDidZoom(scrollView: UIScrollView)
+    func scrollViewDidZoom(_ scrollView: UIScrollView)
     {
         
         if scrollView !== self.mainScrollView
@@ -507,13 +509,13 @@ class PhotoBrowser: UIView, UIScrollViewDelegate, GestureImageViewDelegate {
                 (scrollView.height() - scrollView.contentSize.height) / 2.0 : 0.0;
             
 
-            self.currentImageView.center = CGPointMake(scrollView.contentSize.width / 2.0 + offsetX,
+            self.currentImageView.center = CGPoint(x: scrollView.contentSize.width / 2.0 + offsetX,y:
                                                        scrollView.contentSize.height / 2.0 + offsetY);
         }
 
         
     }
-    func scrollViewDidEndZooming(scrollView: UIScrollView, withView view: UIView?, atScale scale: CGFloat)
+    func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat)
     {
         
         if scale <= 1
@@ -527,7 +529,7 @@ class PhotoBrowser: UIView, UIScrollViewDelegate, GestureImageViewDelegate {
 
         
     }
-    func viewForZoomingInScrollView(scrollView: UIScrollView) -> UIView?
+    private func viewForZoomingInScrollView(scrollView: UIScrollView) -> UIView?
     {
         
         if scrollView !== self.mainScrollView
